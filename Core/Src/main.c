@@ -23,6 +23,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include <stdint.h>
+#include "ds3231.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -93,6 +94,7 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   MX_USART1_UART_Init();
+  HAL_GPIO_WritePin(CE_Pin_GPIO_Port, CE_Pin_Pin, GPIO_PIN_SET);
   /* USER CODE BEGIN 2 */
 #ifdef __GNUC__
 /* With GCC/RAISONANCE, small printf (option LD Linker->Libraries->Small printf
@@ -101,6 +103,20 @@ int main(void)
 #else
 #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
 #endif /* __GNUC__ */
+
+
+
+  HAL_StatusTypeDef ret;
+  uint8_t data_from_sensor[19];
+  for (uint8_t i = 1; i < 128; i++)
+  {
+	  ret = HAL_I2C_IsDeviceReady(&hi2c1, (uint16_t)(i<<1), 3, 5);
+	  if (HAL_OK == ret)
+	  {
+		  printf("I2C device found at Address: %d\r\n", i);
+		  //break;
+	  }
+  }
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -110,11 +126,27 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  HAL_StatusTypeDef read_ret = HAL_I2C_Mem_Read(&hi2c1, (uint16_t)(DS3231_DEV_ADD << 1), (uint16_t)DS3231_SECONDS, I2C_MEMADD_SIZE_8BIT, &data_from_sensor[0], 19, HAL_MAX_DELAY);
 	  HAL_GPIO_WritePin(USR_LED_GPIO_Port, USR_LED_Pin, GPIO_PIN_RESET);
-	  printf("Hello\r\n");
-	  HAL_Delay(200);
+	  HAL_Delay(1000);
+	  if (HAL_OK == read_ret)
+	  {
+		  for (uint8_t i = 0; i < 19; i++)
+		  {
+			  if (0 == i)
+			  {
+				  printf("data_from_sensor[%d] = %d\r\n", i, data_from_sensor[i] >> 0x4);
+			  }
+			  else
+			  {
+				  printf("data_from_sensor[%d] = %d\r\n", i, data_from_sensor[i]);
+			  }
+		  }
+	  }
 	  HAL_GPIO_WritePin(USR_LED_GPIO_Port, USR_LED_Pin, GPIO_PIN_SET);
-	  HAL_Delay(200);
+	  HAL_Delay(1000);
+	  //I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout
+	  //HAL_I2C_Master_Receive(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size, uint32_t Timeout);
   }
   /* USER CODE END 3 */
 }
@@ -257,12 +289,22 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(USR_LED_GPIO_Port, USR_LED_Pin, GPIO_PIN_RESET);
 
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(CE_Pin_GPIO_Port, CE_Pin_Pin, GPIO_PIN_RESET);
+
   /*Configure GPIO pin : USR_LED_Pin */
   GPIO_InitStruct.Pin = USR_LED_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(USR_LED_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : CE_Pin_Pin */
+  GPIO_InitStruct.Pin = CE_Pin_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(CE_Pin_GPIO_Port, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */

@@ -34,34 +34,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := ds1302_bluepill
+BUILD_ARTIFACT_NAME := ds3231_bluepill
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-ds1302_bluepill.elf \
+ds3231_bluepill.elf \
 
 MAP_FILES += \
-ds1302_bluepill.map \
+ds3231_bluepill.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-ds1302_bluepill.list \
+ds3231_bluepill.list \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: ds1302_bluepill.elf secondary-outputs
+main-build: ds3231_bluepill.elf secondary-outputs
 
 # Tool invocations
-ds1302_bluepill.elf ds1302_bluepill.map: $(OBJS) $(USER_OBJS) D:\Projects\STM\ds1302_bluepill\STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "ds1302_bluepill.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"D:\Projects\STM\ds1302_bluepill\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="ds1302_bluepill.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+ds3231_bluepill.elf ds3231_bluepill.map: $(OBJS) $(USER_OBJS) D:\Projects\STM\ds1302_bluepill\STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "ds3231_bluepill.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"D:\Projects\STM\ds1302_bluepill\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="ds3231_bluepill.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -70,14 +70,14 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-ds1302_bluepill.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "ds1302_bluepill.list"
+ds3231_bluepill.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "ds3231_bluepill.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) default.size.stdout ds1302_bluepill.elf ds1302_bluepill.list ds1302_bluepill.map
+	-$(RM) default.size.stdout ds3231_bluepill.elf ds3231_bluepill.list ds3231_bluepill.map
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
